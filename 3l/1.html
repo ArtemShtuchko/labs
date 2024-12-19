@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Завдання 1</title>
+<style>
+  /* параграфи у стовпець */
+  .selected {
+    background-color: yellow;
+  }
+  .column {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    border: 1px solid #000;
+    padding: 10px;
+  }
+  p {
+    margin: 5px 0;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid #ccc;
+  }
+</style>
+</head>
+<body>
+
+<h1>Завдання 1</h1>
+<div class="column" id="elementsContainer">
+  <p>A</p>
+  <p>B</p>
+  <p>C</p>
+  <p>D</p>
+  <p>E</p>
+</div>
+<button id="swapBtn">Swap</button>
+
+<script>
+// Реалізація перестановки вибираємо два параграфи кліком, потім натискаємо "Swap".
+
+let selectedElements = [];
+const container = document.getElementById('elementsContainer');
+const swapBtn = document.getElementById('swapBtn');
+
+container.addEventListener('click', function(e) {
+  if (e.target.tagName.toLowerCase() === 'p') {
+    if (selectedElements.indexOf(e.target) === -1) {
+      if (selectedElements.length < 2) {
+        selectedElements.push(e.target);
+        e.target.classList.add('selected');
+      } else {
+        alert("Вже вибрано дві позиції!");
+      }
+    } else {
+      // Якщо параграф уже вибраний, знімається виділення
+      e.target.classList.remove('selected');
+      selectedElements = selectedElements.filter(el => el !== e.target);
+    }
+  }
+});
+
+swapBtn.addEventListener('click', function() {
+  if (selectedElements.length === 2) {
+    let p1 = selectedElements[0];
+    let p2 = selectedElements[1];
+
+    // Змына тексту
+    let tmp = p1.textContent;
+    p1.textContent = p2.textContent;
+    p2.textContent = tmp;
+
+    // Скид вибіру
+    p1.classList.remove('selected');
+    p2.classList.remove('selected');
+    selectedElements = [];
+  } else {
+    alert("Виберіть два елементи для перестановки.");
+  }
+});
+</script>
+
+</body>
+</html>

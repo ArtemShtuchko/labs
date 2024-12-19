@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Завдання 3</title>
+<style>
+  /* Відображення послідовності як параграфів у стовпець */
+  .selected {
+    background-color: yellow;
+  }
+  .column {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    border: 1px solid #000;
+    padding: 10px;
+  }
+  p {
+    margin: 5px 0;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<h1>Завдання 3</h1>
+<input type="file" id="fileInput"><br><br>
+<div class="column" id="seqContainer"></div>
+<button id="swapBtn" disabled>Swap</button>
+<button id="saveBtn" disabled>Зберегти результат</button>
+
+<script>
+// Користувач завантажує файл з послідовністю чисел.
+// Програма відображає числа як параграфи, можна вибрати два і поміняти місцями (Swap).
+// Потім можна зберегти результат у новий файл.
+
+let selectedElems = [];
+let arr = [];
+
+const seqContainer = document.getElementById('seqContainer');
+const swapBtn = document.getElementById('swapBtn');
+const saveBtn = document.getElementById('saveBtn');
+const fileInput = document.getElementById('fileInput');
+
+fileInput.onchange = function() {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let text = e.target.result;
+    arr = text.trim().split(/\s+/);
+    displayArray();
+    swapBtn.disabled = false;
+    saveBtn.disabled = false;
+  };
+  reader.readAsText(file);
+};
+
+function displayArray() {
+  seqContainer.innerHTML = '';
+  arr.forEach((val, i) => {
+    let p = document.createElement('p');
+    p.textContent = val;
+    p.onclick = function() {
+      selectElement(p,i);
+    };
+    seqContainer.appendChild(p);
+  });
+  selectedElems = [];
+}
+
+function selectElement(elem, index) {
+  if (selectedElems.indexOf(elem)===-1) {
+    if (selectedElems.length<2) {
+      selectedElems.push(elem);
+      elem.classList.add('selected');
+    } else {
+      alert("Вже обрано два елементи, спершу виконайте Swap.");
+    }
+  } else {
+    elem.classList.remove('selected');
+    selectedElems = selectedElems.filter(e=>e!==elem);
+  }
+}
+
+swapBtn.onclick = function() {
+  if (selectedElems.length === 2) {
+    let p1 = selectedElems[0];
+    let p2 = selectedElems[1];
+    let idx1 = Array.from(seqContainer.children).indexOf(p1);
+    let idx2 = Array.from(seqContainer.children).indexOf(p2);
+
+    let temp = arr[idx1];
+    arr[idx1] = arr[idx2];
+    arr[idx2] = temp;
+
+    displayArray();
+  } else {
+    alert("Виберіть два елементи для перестановки.");
+  }
+};
+
+saveBtn.onclick = function() {
+  let text = arr.join(" ");
+  let blob = new Blob([text], {type: 'text/plain'});
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = 'result.txt';
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Завдання 2</title>
+<style>
+  #canvasField {
+    border: 1px solid #000;
+  }
+</style>
+</head>
+<body>
+
+<h1>Завдання 2</h1>
+<p>Введіть початкові координати (x, y):</p>
+<input type="number" id="xInput" placeholder="x"> 
+<input type="number" id="yInput" placeholder="y">
+<button id="setPointBtn">Поставити точку</button>
+
+<p>Змінити координати (x, y):</p>
+<input type="number" id="xUpdate" placeholder="x">
+<input type="number" id="yUpdate" placeholder="y">
+<button id="updatePointBtn">Оновити точку</button>
+
+<p>Поточна відстань до області: <span id="distanceSpan">-</span></p>
+
+<canvas id="canvasField" width="400" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvasField');
+  const ctx = canvas.getContext('2d');
+
+  
+  function inRegion(x,y) {
+    const inVert1 = (x>=1 && x<=3);
+    const inVert2 = (x>=5 && x<=7);
+    const inHorz = (y>=2 && y<=4);
+    return inHorz && (inVert1 || inVert2);
+  }
+
+  function distanceToRegion(x,y) {
+    // По x:
+    let dx;
+    if (x < 1) {
+      dx = Math.min(1 - x, 5 - x);
+    } else if (x > 7) {
+      dx = x - 7;
+    } else if (x > 3 && x < 5) {
+      dx = Math.min(x-3, 5-x);
+    } else {
+      dx = 0;
+    }
+
+    // По y:
+    let dy = 0;
+    if (y < 2) {
+      dy = 2 - y;
+    } else if (y > 4) {
+      dy = y - 4;
+    } else {
+      dy = 0;
+    }
+
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  let currentX = null;
+  let currentY = null;
+
+  function drawScene() {
+    ctx.clearRect(0,0,400,400);
+   
+    ctx.fillStyle = 'lightgreen';
+   
+    drawRectForRegion(1,2,3,4);
+    
+    drawRectForRegion(5,2,7,4);
+
+    // Малюємо точку
+    if (currentX!==null && currentY!==null) {
+      drawPoint(currentX,currentY);
+    }
+  }
+
+  function drawRectForRegion(xmin,ymin,xmax,ymax) {
+    // Масш
+    const scale = 20;
+    let px = xmin * scale;
+    let py = 400 - ymax*scale;
+    let w = (xmax - xmin)*scale;
+    let h = (ymax - ymin)*scale;
+    ctx.fillRect(px, py, w, h);
+  }
+
+  function drawPoint(x,y) {
+    const scale = 20;
+    let px = x*scale;
+    let py = 400 - y*scale;
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(px,py,5,0,2*Math.PI);
+    ctx.fill();
+  }
+
+  function updateDistance() {
+    if (currentX!==null && currentY!==null) {
+      let dist = distanceToRegion(currentX,currentY);
+      document.getElementById('distanceSpan').textContent = dist.toFixed(2);
+    }
+  }
+
+  document.getElementById('setPointBtn').onclick = function() {
+    let xVal = parseFloat(document.getElementById('xInput').value);
+    let yVal = parseFloat(document.getElementById('yInput').value);
+    if (isNaN(xVal)||isNaN(yVal)) {
+      alert("Введіть коректні числа!");
+      return;
+    }
+    currentX = xVal;
+    currentY = yVal;
+    drawScene();
+    updateDistance();
+  };
+
+  document.getElementById('updatePointBtn').onclick = function() {
+    let xVal = parseFloat(document.getElementById('xUpdate').value);
+    let yVal = parseFloat(document.getElementById('yUpdate').value);
+    if (isNaN(xVal)||isNaN(yVal)) {
+      alert("Введіть коректні числа!");
+      return;
+    }
+    currentX = xVal;
+    currentY = yVal;
+    drawScene();
+    updateDistance();
+  };
+
+  drawScene();
+</script>
+
+</body>
+</html>
